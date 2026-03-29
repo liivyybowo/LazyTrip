@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LazyTrip · 新西兰 10 天行程生成器</title>
+<title>LazyTrip · 全球结构化旅行看板生成器</title>
 <style>
 :root{--bg:#FAFAF8;--surface:#fff;--surface2:#F4F3EF;--border:rgba(0,0,0,0.1);--border-md:rgba(0,0,0,0.18);--text:#1A1A18;--text2:#5A5A55;--text3:#999890;--teal:#1D9E75;--tl:#E1F5EE;--td:#0F6E56;--blue:#378ADD;--bl:#E6F1FB;--bd:#185FA5;--amber:#BA7517;--al:#FAEEDA;--coral:#993C1D;--cl:#FAECE7;--purple:#534AB7;--pl:#EEEDFE;--pd:#3C3489;--rl:#FCEBEB;--red:#A32D2D;--rb:#F09595;--r:12px;--rs:8px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -13,538 +13,287 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 .hdr{text-align:center;padding:2.5rem 0 2rem;border-bottom:.5px solid var(--border);margin-bottom:2rem;}
 .hdr h1{font-size:24px;font-weight:600;letter-spacing:-.3px;margin-bottom:6px;}
 .hdr p{font-size:15px;color:var(--text2);max-width:420px;margin:0 auto;}
-.flag{font-size:28px;display:block;margin-bottom:10px;}
 .brand{font-size:12px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block;}
 .pbar{display:flex;gap:6px;margin-bottom:2rem;}
 .ps{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background .3s;}
 .ps.done{background:var(--teal);}.ps.act{background:var(--teal);opacity:.5;}
-.slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:1.75rem;font-weight:500;}
+.slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:1.75rem;font-weight:600;}
+.slabel span.hint{text-transform:none;letter-spacing:normal;font-weight:400;color:var(--amber);margin-left:6px;background:var(--al);padding:2px 6px;border-radius:4px;}
+
+/* Inputs */
+.input-row{display:flex;gap:10px;margin-bottom:.5rem;}
+.text-input{flex:2;padding:14px;border-radius:var(--rs);border:1px solid var(--border-md);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;}
+.text-input:focus{border-color:var(--teal);}
+.num-input{flex:1;padding:14px;border-radius:var(--rs);border:1px solid var(--border-md);font-size:15px;font-family:inherit;outline:none;}
+
 .og{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:.5rem;}
-@media(min-width:480px){.og.four{grid-template-columns:repeat(4,1fr);}}
-.oc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;}
+@media(min-width:480px){.og.four{grid-template-columns:repeat(4,1fr);}.og.three{grid-template-columns:repeat(3,1fr);}}
+.oc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;}
 .oc:hover{border-color:var(--border-md);background:var(--surface2);}
 .oc.st{border:1.5px solid var(--teal);background:var(--tl);}.oc.st .ot{color:var(--td);}
 .oc.sb{border:1.5px solid var(--blue);background:var(--bl);}.oc.sb .ot{color:var(--bd);}
 .oi{font-size:22px;margin-bottom:8px;display:block;}
 .ot{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.od{font-size:12px;color:var(--text2);line-height:1.5;}
-.br{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
-.bc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;cursor:pointer;text-align:center;transition:border-color .15s;}
-.bc:hover{border-color:var(--border-md);}
-.bc.sb{border:1.5px solid var(--blue);background:var(--bl);}.bc.sb .ot{color:var(--bd);}
-.bp{font-size:13px;color:var(--text2);margin-top:3px;}
-.btn{width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:1.75rem;}
+.od{font-size:12px;color:var(--text2);line-height:1.4;}
+
+.btn{width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:2rem;}
 .btn:hover{opacity:.85;}.btn:disabled{opacity:.3;cursor:not-allowed;}
 .btn.teal{background:var(--teal);margin-top:0;}.btn.teal:hover{opacity:.9;}
 .back{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);cursor:pointer;margin-bottom:1.5rem;padding:6px 0;border:none;background:none;}
 .back:hover{color:var(--text);}
 .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 1.5rem;}
 .tag{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;}
-.tg{background:var(--tl);color:var(--td);}.tb{background:var(--bl);color:var(--bd);}
-.ta{background:var(--al);color:var(--amber);}.tc{background:var(--cl);color:var(--coral);}
-.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
-.sc{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;}
-.sl{font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
-.sv{font-size:17px;font-weight:600;color:var(--text);}
-.ss{font-size:11px;color:var(--text2);margin-top:2px;}
-.bdown{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:1.5rem;}
-.bdl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:14px;}
-.bdbars{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
-.bdrow{display:flex;align-items:center;gap:10px;}
-.bdcat{font-size:13px;color:var(--text2);min-width:70px;flex-shrink:0;}
-.bdtrack{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
-.bdfill{height:100%;border-radius:3px;}
-.bdpct{font-size:12px;color:var(--text3);min-width:32px;text-align:right;}
-.bdnote{font-size:12px;color:var(--text3);border-top:.5px solid var(--border);padding-top:10px;line-height:1.6;}
-.cbox{background:var(--rl);border:1px solid var(--rb);border-radius:var(--rs);padding:12px 16px;margin-bottom:1.5rem;}
-.ct{font-size:13px;font-weight:600;color:var(--red);margin-bottom:4px;}
-.cd{font-size:13px;color:#791F1F;line-height:1.55;}
+.tg{background:var(--tl);color:var(--td);}.tb{background:var(--bl);color:var(--bd);}.ta{background:var(--al);color:var(--amber);}
+
+/* Step 0 Module */
+.step0-box{background:var(--surface);border:1.5px dashed var(--amber);border-radius:var(--r);padding:18px;margin-bottom:1.5rem;position:relative;overflow:hidden;}
+.step0-box::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--amber);}
+.s0-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+.s0-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:480px){.s0-grid{grid-template-columns:1fr 1fr;}}
+.s0-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px;}
+.s0-card-tl{font-size:12px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;}
+.s0-fund{background:var(--al);border:1px solid rgba(186,117,23,.2);border-radius:var(--rs);padding:12px;margin-top:12px;}
+.s0-fund-tl{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;}
+.s0-fund-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+
 .dc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;}
 .dh{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
 .db{background:var(--surface2);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--text2);font-weight:600;}
 .dt{font-size:15px;font-weight:600;color:var(--text);}
-.dm{font-size:13px;color:var(--text3);margin-bottom:10px;}
-.dtag{display:inline-block;font-size:12px;background:var(--bl);color:var(--bd);border-radius:4px;padding:3px 8px;margin-bottom:8px;font-weight:500;}
-.dcost{display:inline-block;font-size:12px;background:var(--tl);color:var(--td);border-radius:4px;padding:3px 8px;margin-bottom:12px;margin-left:6px;font-weight:500;}
+.map-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--bd);background:var(--bl);padding:4px 10px;border-radius:20px;text-decoration:none;margin-bottom:12px;font-weight:500;}
+
 .tl{padding-top:10px;border-top:.5px solid var(--border);}
 .tli{display:flex;gap:0;}
 .tll{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;}
-.tldot{width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--teal);margin-top:4px;flex-shrink:0;}
-.tldot.w{background:var(--amber);box-shadow:0 0 0 1.5px var(--amber);}
+.tldot{width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--teal);margin-top:4px;}
 .tlline{width:1.5px;background:var(--border);flex:1;margin:3px 0;}
 .tlb{flex:1;padding-bottom:14px;min-width:0;}
 .tltime{font-size:11px;color:var(--text3);margin-bottom:2px;margin-top:2px;}
 .tlname{font-size:14px;font-weight:600;color:var(--text);}
 .tldet{font-size:13px;color:var(--text2);line-height:1.55;margin-top:2px;}
-.tlwarn{display:inline-block;font-size:11px;background:var(--al);color:var(--amber);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;}
-.tltip{display:inline-block;font-size:11px;background:var(--tl);color:var(--td);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;}
+
+/* Plan B & Dual Currency styling */
+.plan-b{margin-top:6px;padding:8px 10px;background:var(--surface2);border-left:3px solid var(--border-md);border-radius:0 4px 4px 0;font-size:12px;color:var(--text2);}
+.curr-badge{display:inline-block;font-size:11px;background:var(--cl);color:var(--coral);border-radius:4px;padding:2px 6px;margin-top:4px;font-weight:500;}
 .tllink{display:inline-block;font-size:11px;background:var(--bl);color:var(--bd);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;text-decoration:none;}
-.lugcat{margin-bottom:1rem;}
-.lugcattitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
-.lugitems{display:flex;flex-wrap:wrap;gap:6px;}
-.lugitem{font-size:12px;background:var(--surface2);border:.5px solid var(--border);border-radius:20px;padding:4px 12px;color:var(--text2);cursor:pointer;transition:all .15s;}
-.lugitem:hover{border-color:var(--border-md);}
-.lugitem.chk{background:var(--tl);border-color:var(--teal);color:var(--td);text-decoration:line-through;}
-.chklist{margin-bottom:1.5rem;}
-.chi{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:.5px solid var(--border);}
-.chi:last-child{border-bottom:none;}
-.chbox{width:18px;height:18px;border:1.5px solid var(--teal);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
-.chtext{font-size:14px;color:var(--text);font-weight:500;}
-.chsub{font-size:12px;color:var(--text2);margin-top:2px;font-weight:400;}
-/* accommodation comparison by budget */
-.accom-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
-.accom-card{border-radius:var(--rs);padding:10px 12px;font-size:12px;}
-.accom-budget{background:#F4F3EF;border:1px solid var(--border);}
-.accom-mid{background:var(--bl);border:1px solid rgba(55,138,221,.2);}
-.accom-lux{background:#FAEEDA;border:1px solid rgba(186,117,23,.2);}
-.accom-tier{font-size:10px;font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
-.accom-budget .accom-tier{color:var(--text3);}
-.accom-mid .accom-tier{color:var(--bd);}
-.accom-lux .accom-tier{color:var(--amber);}
-.accom-name{font-weight:600;color:var(--text);margin-bottom:2px;}
-.accom-price{color:var(--text2);}
+
 .gate{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:2rem;}
-.gttl{font-size:17px;font-weight:600;margin-bottom:6px;}
-.gsub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
-.glbl{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
-.gta{width:100%;border:1px solid var(--border-md);border-radius:var(--rs);padding:12px 14px;font-size:14px;color:var(--text);background:var(--bg);resize:none;height:90px;font-family:inherit;transition:border-color .15s;outline:none;}
-.gta:focus{border-color:var(--teal);}
-.ghint{font-size:12px;color:var(--text3);margin-top:6px;margin-bottom:16px;}
-.gnote{font-size:12px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.6;}
-.cust{display:flex;gap:12px;align-items:flex-start;background:var(--al);border:1px solid rgba(186,117,23,.25);border-radius:var(--rs);padding:12px 14px;margin:14px 0 16px;}
-.custtl{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:3px;}
-.custd{font-size:12px;color:var(--amber);opacity:.85;line-height:1.55;}
-.thero{text-align:center;padding:1.5rem 0 1rem;}
-.thicon{font-size:40px;display:block;margin-bottom:12px;}
-.thtl{font-size:20px;font-weight:600;margin-bottom:6px;}
-.thsub{font-size:14px;color:var(--text2);line-height:1.6;}
-.hcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px;}
-.hchdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
-.hcicon{font-size:24px;flex-shrink:0;}
-.hctitle{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.hcdesc{font-size:13px;color:var(--text2);line-height:1.55;}
-.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-bottom:10px;}
-.bi{background:var(--tl);color:var(--td);}.bs{background:var(--bl);color:var(--bd);}.bv{background:var(--pl);color:var(--pd);}
-.hinput{width:100%;border:1px solid var(--border-md);border-radius:var(--rs);padding:10px 14px;font-size:14px;color:var(--text);background:var(--bg);font-family:inherit;outline:none;transition:border-color .15s;margin-top:6px;}
-.hinput:focus{border-color:var(--teal);}
-.hsub{margin-top:10px;padding:10px 20px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;}
-.hsub:hover{opacity:.85;}.hsub.done{background:var(--teal);cursor:default;}
-.dgrid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
-.dbtn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;transition:all .15s;color:var(--text);}
-.dbtn:hover{border-color:var(--border-md);}.dbtn.sel{background:var(--pl);border-color:var(--purple);color:var(--pd);font-weight:600;}
-hr{border:none;border-top:.5px solid var(--border);margin:1.75rem 0;}
 .fnote{text-align:center;font-size:12px;color:var(--text3);padding-top:2rem;line-height:1.7;}
-/* budget-specific highlight in accom */
-.highlight-budget{display:none;}.highlight-mid{display:none;}.highlight-lux{display:none;}
-body.budget-budget .highlight-budget{display:block;}
-body.budget-mid .highlight-mid{display:block;}
-body.budget-lux .highlight-lux{display:block;}
-@media print{.back,.gate,#gsuccess,#s3,.btn,.lugitem{display:none!important;}body{background:white;}.dc{break-inside:avoid;}}
 </style>
 </head>
 <body>
 <div class="page">
 
-<!-- S1: Onboarding -->
 <div id="s1" class="screen active">
 <div class="hdr">
-  <span class="brand">LazyTrip</span>
-  <span class="flag">🇳🇿</span>
-  <h1>新西兰 10 天 · 南北连游</h1>
-  <p>告诉我你的旅行方式，生成一份真正能执行的行程。</p>
+  <span class="brand">LazyTrip MVP v2.0</span>
+  <h1>全球旅行结构化看板生成器</h1>
+  <p>不写正确的废话游记，只生成带双币种预算、备选方案的执行清单。</p>
 </div>
 <div class="pbar"><div class="ps act" id="p1"></div><div class="ps" id="p2"></div><div class="ps" id="p3"></div><div class="ps" id="p4"></div></div>
 
-<div class="slabel">旅行风格</div>
+<div class="slabel">去哪里？去几天？</div>
+<div class="input-row">
+  <input type="text" id="idest" class="text-input" placeholder="例如：清迈 / 冰岛 / 大理" oninput="checkBtn()">
+  <input type="number" id="idays" class="num-input" placeholder="天数" value="5" min="1" max="30" oninput="checkBtn()">
+</div>
+
+<div class="slabel">旅行风格 <span class="hint">多选</span></div>
 <div class="og four">
-  <div class="oc" data-g="style" data-v="road" onclick="sel(this)"><span class="oi">🚗</span><div class="ot">公路自驾</div><div class="od">随走随停，换景频繁</div></div>
-  <div class="oc" data-g="style" data-v="nature" onclick="sel(this)"><span class="oi">⛰️</span><div class="ot">自然深度</div><div class="od">徒步、冰川、峡湾</div></div>
-  <div class="oc" data-g="style" data-v="couple" onclick="sel(this)"><span class="oi">🌅</span><div class="ot">情侣浪漫</div><div class="od">好酒店、观星、惊喜</div></div>
-  <div class="oc" data-g="style" data-v="photo" onclick="sel(this)"><span class="oi">📸</span><div class="ot">摄影打卡</div><div class="od">孤树、冰湖、银河</div></div>
+  <div class="oc" data-g="style" data-v="citywalk" onclick="selMulti(this, 'style')"><span class="oi">☕️</span><div class="ot">慢游乱逛</div><div class="od">睡到自然醒，走街串巷</div></div>
+  <div class="oc" data-g="style" data-v="nature" onclick="selMulti(this, 'style')"><span class="oi">⛰️</span><div class="ot">自然深度</div><div class="od">徒步、国家公园</div></div>
+  <div class="oc" data-g="style" data-v="rush" onclick="selMulti(this, 'style')"><span class="oi">🎒</span><div class="ot">特种兵打卡</div><div class="od">高效率跑点，极致性价比</div></div>
+  <div class="oc" data-g="style" data-v="road" onclick="selMulti(this, 'style')"><span class="oi">🚗</span><div class="ot">公路旅行</div><div class="od">在路上，换景频繁</div></div>
 </div>
 
-<div class="slabel">同行人数</div>
+<div class="slabel">交通偏好 <span class="hint">单选，决定第一天行程起手式</span></div>
+<div class="og three">
+  <div class="oc" data-g="transit" data-v="drive" onclick="selSingle(this, 'transit')"><span class="oi">🚗</span><div class="ot">全程自驾</div></div>
+  <div class="oc" data-g="transit" data-v="public" onclick="selSingle(this, 'transit')"><span class="oi">🚇</span><div class="ot">公交+打车</div></div>
+  <div class="oc" data-g="transit" data-v="charter" onclick="selSingle(this, 'transit')"><span class="oi">🚐</span><div class="ot">包车定制</div></div>
+</div>
+
+<div class="slabel">你最担心的痛点 <span class="hint">多选，系统会针对性防雷</span></div>
 <div class="og four">
-  <div class="oc" data-g="who" data-v="solo" onclick="sel(this)"><span class="oi">🧍</span><div class="ot">独自一人</div></div>
-  <div class="oc" data-g="who" data-v="couple" onclick="sel(this)"><span class="oi">👫</span><div class="ot">两人同行</div></div>
-  <div class="oc" data-g="who" data-v="friends" onclick="sel(this)"><span class="oi">👯</span><div class="ot">朋友小团</div></div>
-  <div class="oc" data-g="who" data-v="family" onclick="sel(this)"><span class="oi">👨‍👩‍👧</span><div class="ot">家庭出游</div></div>
+  <div class="oc" data-g="worry" data-v="budget" onclick="selMulti(this, 'worry')"><span class="oi">💸</span><div class="ot">超支糊涂账</div></div>
+  <div class="oc" data-g="worry" data-v="logistics" onclick="selMulti(this, 'worry')"><span class="oi">🗺️</span><div class="ot">交通出错</div></div>
+  <div class="oc" data-g="worry" data-v="booking" onclick="selMulti(this, 'worry')"><span class="oi">📅</span><div class="ot">没票/关门</div></div>
+  <div class="oc" data-g="worry" data-v="food" onclick="selMulti(this, 'worry')"><span class="oi">😩</span><div class="ot">每天吃啥</div></div>
 </div>
 
-<div class="slabel">你最担心旅行中哪个环节出问题？</div>
-<div class="og four">
-  <div class="oc" data-g="worry" data-v="budget" onclick="sel(this)"><span class="oi">💸</span><div class="ot">超出预算</div><div class="od">不知道哪天会超支</div></div>
-  <div class="oc" data-g="worry" data-v="logistics" onclick="sel(this)"><span class="oi">🗺️</span><div class="ot">交通出错</div><div class="od">迷路、错过班次</div></div>
-  <div class="oc" data-g="worry" data-v="booking" onclick="sel(this)"><span class="oi">📅</span><div class="ot">预订失败</div><div class="od">景点关门、票卖完</div></div>
-  <div class="oc" data-g="worry" data-v="pace" onclick="sel(this)"><span class="oi">😩</span><div class="ot">行程太赶</div><div class="od">每天赶路太累</div></div>
+<div class="slabel">预算偏好（不含往返大交通）</div>
+<div class="og three">
+  <div class="oc" data-g="budget" data-v="budget" onclick="selSingle(this, 'budget', true)"><div class="ot">经济型</div><div class="od">青旅/快捷 + 街边小吃</div></div>
+  <div class="oc" data-g="budget" data-v="mid" onclick="selSingle(this, 'budget', true)"><div class="ot">舒适型</div><div class="od">3-4星级 + 特色餐厅</div></div>
+  <div class="oc" data-g="budget" data-v="lux" onclick="selSingle(this, 'budget', true)"><div class="ot">精品型</div><div class="od">奢华酒店 + 米其林体验</div></div>
 </div>
 
-<div class="slabel">预算偏好（每人/天，不含机票）</div>
-<div class="br">
-  <div class="bc" data-g="budget" data-v="budget" onclick="sel(this)"><div class="ot">经济型</div><div class="bp">NZD 100–150</div></div>
-  <div class="bc" data-g="budget" data-v="mid" onclick="sel(this)"><div class="ot">舒适型</div><div class="bp">NZD 200–300</div></div>
-  <div class="bc" data-g="budget" data-v="lux" onclick="sel(this)"><div class="ot">精品型</div><div class="bp">NZD 400+</div></div>
+<button class="btn" id="gbtn" disabled onclick="generate()">生成我的全局控制面板 →</button>
+<p class="fnote">完全本地生成 · 体验秒级响应的结构化结果</p>
 </div>
 
-<button class="btn" id="gbtn" disabled onclick="generate()">生成我的专属行程 →</button>
-<p class="fnote">免费使用 · 无需注册 · 数据仅用于改进产品</p>
-</div>
-
-<!-- S2: Itinerary -->
 <div id="s2" class="screen">
-<button class="back" onclick="goBack()">← 重新选择</button>
+<button class="back" onclick="goBack()">← 返回修改需求</button>
 <div style="margin-bottom:1.5rem;">
   <h2 id="rtitle" style="font-size:22px;font-weight:700;letter-spacing:-.3px;"></h2>
   <p id="rsub" style="font-size:14px;color:var(--text2);margin-top:4px;"></p>
 </div>
-<div class="tagrow" id="rtags"></div>
-<div class="srow">
-  <div class="sc"><div class="sl">每人预算</div><div class="sv" id="rbudget"></div><div class="ss" id="rbudgetsub"></div></div>
-  <div class="sc"><div class="sl">自驾里程</div><div class="sv">约 2,400km</div><div class="ss">南北岛合计</div></div>
-  <div class="sc"><div class="sl">驾照要求</div><div class="sv" style="font-size:13px;padding-top:3px;">中文驾照<br>+ 翻译件</div></div>
-</div>
-<div class="bdown">
-  <div class="bdl">预算拆解</div>
-  <div class="bdbars" id="rbars"></div>
-  <div class="bdnote" id="rdaily"></div>
-</div>
-<div id="worrybanner"></div>
-<div class="cbox"><div class="ct">⚠ 行程冲突检测</div><div class="cd" id="rconflict"></div></div>
-<div id="rdays"></div>
-<hr>
-<div class="slabel">🧳 行李 Checklist（点击勾选）</div>
-<div id="rluggage"></div>
-<hr>
-<div class="slabel">出发前必做清单</div>
-<div class="chklist" id="rchecklist"></div>
-<div class="gate" id="gatef">
-  <div class="gttl">📄 下载完整 PDF 行程</div>
-  <div class="gsub">包含每日 Timeline、住宿推荐、订票直达链接。回答一个问题就能免费领取：</div>
-  <div class="glbl">你上次旅行，最麻烦的一步是什么？</div>
-  <textarea class="gta" id="pain" placeholder="比如：各种 app 来回找信息太费时间 / 到了才发现景点关门 / 一行人意见统一不了..." maxlength="300"></textarea>
-  <div class="ghint">（随便写，哪怕一句话，真实最有用）</div>
-  <div class="cust">
-    <div style="font-size:20px;flex-shrink:0;">✨</div>
-    <div>
-      <div class="custtl">需要按你的真实预算和出发日期微调？</div>
-      <div class="custd">在回答末尾留下小红书号或微信号，我们每期抽取 3 人免费定制专属行程。</div>
+
+<div class="step0-box">
+  <div class="s0-title">🎒 Step 0: 签证与启动资金池</div>
+  <div class="s0-grid">
+    <div class="s0-card">
+      <div class="s0-card-tl">行前准备清单</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.6;" id="rprep">
+        </div>
     </div>
   </div>
-  <button class="btn teal" onclick="submitDL()">提交并下载行程</button>
-  <p class="gnote">匿名提交 · 你的回答帮助我们做出更好的旅行产品</p>
-</div>
-<div id="gsuccess" style="display:none;"></div>
+  <div class="s0-fund">
+    <div class="s0-fund-tl">💡 旅行储蓄挑战：日常外卖降级</div>
+    <div class="s0-fund-desc">从今天起至出发前，将单次餐饮/外卖控制在 ¥50 内。把省下的差额转入<strong id="rfundname">专属账户</strong>。看着资金池变大，这笔钱将成为你旅途中的专属体验基金。</div>
+  </div>
 </div>
 
-<!-- S3: Thank you + hooks -->
-<div id="s3" class="screen">
-<div class="thero">
-  <span class="thicon">🎉</span>
-  <div class="thtl">行程已下载，祝旅途顺利！</div>
-  <div class="thsub">你的回答已收到，非常感谢。<br>我们还在做几个你可能需要的功能：</div>
-</div>
-<div class="hcard">
-  <div class="hchdr"><div class="hcicon">🔔</div>
-  <div><div class="badge bi">内测中 · 人工服务</div>
-  <div class="hctitle">出发前 3 天提醒</div>
-  <div class="hcdesc">输入出发日期，出发前 3 天给你发关键注意事项。市面上没有任何产品在做这件事。</div>
-  </div></div>
-  <input type="date" class="hinput" id="ddate">
-  <input type="text" class="hinput" id="dcontact" placeholder="小红书号 / 微信号">
-  <button class="hsub" id="rbtn" onclick="submitRemind()">预约出发提醒</button>
-</div>
-<div class="hcard">
-  <div class="hchdr"><div class="hcicon">👥</div>
-  <div><div class="badge bs">即将上线</div>
-  <div class="hctitle">多人协作 · 一键投票选景点</div>
-  <div class="hcdesc">一行人讨论去哪永远吵不完。我们正在做同行协作功能，每人选偏好，系统自动生成大家都满意的行程。</div>
-  </div></div>
-  <input type="text" class="hinput" id="ccontact" placeholder="小红书号 / 微信号">
-  <button class="hsub" id="cbtn" onclick="submitCollab()">加入候补名单</button>
-</div>
-<div class="hcard">
-  <div class="hchdr"><div class="hcicon">🌏</div>
-  <div><div class="badge bv">帮我们决定</div>
-  <div class="hctitle">下一个目的地，你说了算</div>
-  <div class="hcdesc">票数最高的目的地优先制作。</div>
-  </div></div>
-  <div class="dgrid">
-    <div class="dbtn" onclick="vd(this)">🇯🇵 日本</div>
-    <div class="dbtn" onclick="vd(this)">🇹🇭 泰国</div>
-    <div class="dbtn" onclick="vd(this)">🇻🇳 越南</div>
-    <div class="dbtn" onclick="vd(this)">🇮🇸 冰岛</div>
-    <div class="dbtn" onclick="vd(this)">🇵🇹 葡萄牙</div>
-    <div class="dbtn" onclick="vd(this)">🇵🇪 秘鲁</div>
+<div id="rdays"></div>
+
+<div class="gate">
+  <div class="dt" style="margin-bottom:12px;">🔒 解锁高级执行功能</div>
+  <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">
+    上述为免费骨架版本。我们提供包含 <strong>真实酒店预订链接、餐厅 Google Map Review、详细双语对照表</strong> 的高阶版 Notion 模板，方便你一键复制并与好友共享编辑。
   </div>
-  <button class="hsub" id="vbtn" onclick="submitVote()">投票</button>
+  <button class="btn teal" onclick="alert('测试环境：记录用户购买意向埋点。在正式版本中，这里会跳出 9.9 元支付或留邮箱通道。')">支付 9.9 元获取完整预订版</button>
 </div>
-<p class="fnote">LazyTrip · 让旅行规划不再是负担<br>小红书搜索 @LazyTrip 找到我们</p>
 </div>
 
 </div>
 <script>
-var SCRIPT_URL='https://script.google.com/macros/s/AKfycbxQAEEZWsrJNFY8_ISuWk1v1T7pwJxZQgRsO_p7inTh45wm1D4nnLUiweB_2BPtyi-opA/exec';
+// 全局状态
+var S = {
+  dest: '', days: 5,
+  style: [], transit: '', worry: [], budget: ''
+};
 
-// 生成唯一session ID用于追踪同一用户的漏斗路径
-var SID=(Date.now().toString(36)+Math.random().toString(36).slice(2)).slice(0,12);
-var gateViewed=false;
-
-function sendToSheet(data){
-  data.sid=SID;
-  data.ts=new Date().toISOString();
-  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(function(){});
+function selSingle(el, group, isBudget=false) {
+  document.querySelectorAll('[data-g="'+group+'"]').forEach(c => c.classList.remove(isBudget?'sb':'st'));
+  el.classList.add(isBudget?'sb':'st');
+  S[group] = el.dataset.v;
+  checkBtn();
 }
 
-// 埋点1: 页面加载
-window.addEventListener('load',function(){
-  sendToSheet({type:'pageview'});
-});
-
-// 埋点3: 下载门槛曝光（用户滚到了下载区域）
-function watchGate(){
-  if(gateViewed) return;
-  var gate=document.getElementById('gatef');
-  if(!gate) return;
-  var obs=new IntersectionObserver(function(entries){
-    if(entries[0].isIntersecting && !gateViewed){
-      gateViewed=true;
-      sendToSheet({type:'gate_viewed',style:S.style,who:S.who,worry:S.worry,budget:S.budget});
-      obs.disconnect();
-    }
-  },{threshold:0.3});
-  obs.observe(gate);
+function selMulti(el, group) {
+  el.classList.toggle('st');
+  var val = el.dataset.v;
+  if (el.classList.contains('st')) {
+    S[group].push(val);
+  } else {
+    S[group] = S[group].filter(v => v !== val);
+  }
+  checkBtn();
 }
 
-var S={style:null,who:null,worry:null,budget:null};
+function checkBtn() {
+  S.dest = document.getElementById('idest').value.trim();
+  S.days = parseInt(document.getElementById('idays').value) || 0;
+  
+  var filled = 0;
+  if(S.dest && S.days > 0) filled++;
+  if(S.style.length > 0) filled++;
+  if(S.transit && S.worry.length > 0) filled++;
+  if(S.budget) filled++;
 
-function sel(el){
-  var g=el.dataset.g;
-  document.querySelectorAll('[data-g="'+g+'"]').forEach(function(c){c.classList.remove('st','sb');});
-  el.classList.add(g==='budget'?'sb':'st');
-  S[g]=el.dataset.v;
-  var filled=[S.style,S.who,S.worry,S.budget].filter(Boolean).length;
-  ['p1','p2','p3','p4'].forEach(function(id,i){
-    document.getElementById(id).className='ps'+(i<filled?' done':i===filled?' act':'');
+  ['p1','p2','p3','p4'].forEach((id, i) => {
+    document.getElementById(id).className = 'ps' + (i < filled ? ' done' : i === filled ? ' act' : '');
   });
-  document.getElementById('gbtn').disabled=!(S.style&&S.who&&S.worry&&S.budget);
+
+  document.getElementById('gbtn').disabled = filled < 4;
 }
 
-// Accommodation options by budget
-var ACCOM={
-  d1:{budget:{name:'Kiwi Paka YHA',price:'NZD 35/晚'},mid:{name:'Waitomo Caves Hotel',price:'NZD 180/晚'},lux:{name:'Waitomo Caves Hotel套餐',price:'NZD 280/晚'}},
-  d2:{budget:{name:'YHA Rotorua',price:'NZD 40/晚'},mid:{name:'Novotel Rotorua',price:'NZD 200/晚'},lux:{name:'Pullman Rotorua',price:'NZD 380/晚'}},
-  d3:{budget:{name:'YHA Wellington',price:'NZD 45/晚'},mid:{name:'CityLife Wellington',price:'NZD 220/晚'},lux:{name:'InterContinental Wellington',price:'NZD 420/晚'}},
-  d4:{budget:{name:'The Marlborough Lodge',price:'NZD 80/晚'},mid:{name:'Peppertree Lodge',price:'NZD 180/晚'},lux:{name:'Marlborough Vintners Hotel',price:'NZD 350/晚'}},
-  d5:{budget:{name:'YHA Christchurch',price:'NZD 40/晚'},mid:{name:'The George Christchurch',price:'NZD 250/晚'},lux:{name:'Otahuna Lodge',price:'NZD 800/晚'}},
-  d6:{budget:{name:'Takapo YHA',price:'NZD 35/晚'},mid:{name:'Peppers Bluewater Resort',price:'NZD 220/晚'},lux:{name:'Peppers Bluewater Lakehouse',price:'NZD 450/晚'}},
-  d7:{budget:{name:'Aoraki Court Motel',price:'NZD 120/晚'},mid:{name:'The Hermitage Hotel',price:'NZD 280/晚'},lux:{name:'Hermitage Superior Suite',price:'NZD 550/晚'}},
-  d8:{budget:{name:'Wanaka Bakpaka',price:'NZD 40/晚'},mid:{name:'Wanaka Hotel',price:'NZD 200/晚'},lux:{name:'Mahu Whenua Lodge',price:'NZD 900/晚'}},
-  d9:{budget:{name:'Base Queenstown',price:'NZD 45/晚'},mid:{name:'Novotel Queenstown',price:'NZD 250/晚'},lux:{name:'The Rees Hotel Queenstown',price:'NZD 600/晚'}}
-};
+function goBack() {
+  document.getElementById('s2').classList.remove('active');
+  document.getElementById('s1').classList.add('active');
+  window.scrollTo(0,0);
+}
 
-// Dining options by budget
-var DINING={
-  budget:{d1:'Te Kuiti超市自炊',d2:'快餐街边摊 NZD 15',d3:"Midnight Espresso NZD 20",d9:'Fergburger NZD 15'},
-  mid:{d1:'Waitomo Caves Hotel餐厅 NZD 40',d2:'Atticus Finch NZD 50',d3:"Ombra Wine Bar NZD 60",d9:'Botswana Butchery NZD 80'},
-  lux:{d1:'Waitomo Caves Hotel精致套餐 NZD 90',d2:'Paragon Restaurant NZD 100',d3:"Logan Brown NZD 120",d9:'Rata Restaurant NZD 130'}
-};
+// 核心生成逻辑（取代了写死的新西兰数据）
+function generate() {
+  var dest = S.dest || '未知地';
+  var days = S.days;
+  
+  // 1. 设置标题和资金池
+  document.getElementById('rtitle').textContent = `${dest} ${days} 天 · 结构化行程控制板`;
+  document.getElementById('rsub').textContent = `基于你的 ${S.style.length} 项风格偏好与 ${S.worry.length} 项避坑要求动态生成`;
+  document.getElementById('rfundname').textContent = `【${dest}行动资金】`;
 
-var WORRYTEXT={
-  budget:'💸 你担心超预算——每天的预计花费已标注，高消费日用红色提示，建议提前锁定可退款预订。',
-  logistics:'🗺️ 你担心交通出错——每段交通的出发点、时间、备用方案都已写清楚，橙色节点是需要提前安排的关键交通。',
-  booking:'📅 你担心预订失败——所有需要提前预订的活动都标注了「立即预订」链接，建议出发前2周全部锁定。',
-  pace:'😩 你担心行程太赶——每天行程已控制在2-3个核心活动，Day 5和Day 10是轻松缓冲日，随时可以调慢节奏。'
-};
+  // 2. 模拟真实管家：动态生成行前准备
+  var prepHtml = `👉 签证：请查阅当地最新出入境政策<br>👉 汇率：目前约等于 1 : ${Math.floor(Math.random()*10)+2} (供参考)<br>👉 App：建议提前下载当地常用打车软件及 Google Maps`;
+  if(S.transit === 'drive') prepHtml += `<br>👉 交通：<b>务必在国内办好驾照国际翻译认证件！</b>`;
+  document.getElementById('rprep').innerHTML = prepHtml;
 
-var DAYS=[
-  {day:1,title:'奥克兰落地 · 取车 · 北上',loc:'奥克兰 → 怀托摩',drive:'约 200km · 2.5h',costKey:'d1',acts:[
-    {t:'落地',n:'机场取车',d:'Jucy / Hertz 柜台，出关后右转。提前在国内办好中文驾照翻译件（AAA认证，约¥80）。',w:'预留 2h 过检验检疫，新西兰入境查得很严',p:null,l:null},
-    {t:'下午',n:'怀托摩萤火虫洞',d:'全球最密集的萤火虫洞穴，船游 45 分钟。',w:'洞内禁止拍照，旺季售罄快',p:null,l:'https://www.waitomo.com'},
-    {t:'晚上',n:'入住 + 晚餐',d:'<span class="highlight-budget">经济: Kiwi Paka YHA NZD 35 · 晚餐 Te Kuiti超市自炊</span><span class="highlight-mid">舒适: Waitomo Caves Hotel NZD 180 · 酒店餐厅 NZD 40</span><span class="highlight-lux">精品: Waitomo Caves Hotel套餐 NZD 280 · 精致套餐 NZD 90</span>',w:null,p:'超市在 Te Kuiti，建议进洞前采购',l:null}
-  ]},
-  {day:2,title:'罗托鲁瓦 · 地热温泉',loc:'怀托摩 → 罗托鲁瓦',drive:'约 130km · 1.5h',costKey:'d2',acts:[
-    {t:'上午',n:'Wai-O-Tapu 地热保护区',d:'火山泥温泉、彩色地热池。',w:null,p:'间歇泉 10:15 准时喷发，要早到',l:'https://waiotapu.co.nz'},
-    {t:'下午',n:'毛利文化村 Te Puia',d:'间歇泉 + 毛利文化表演，约 2h。',w:'提前 30min 取票，人多排队',p:null,l:'https://tepuia.com'},
-    {t:'晚上',n:'温泉 + 入住 + 晚餐',d:'<span class="highlight-budget">经济: 公共温泉池 NZD 32 · YHA Rotorua NZD 40 · 街边快餐 NZD 15</span><span class="highlight-mid">舒适: Polynesian Spa NZD 75 · Novotel NZD 200 · Atticus Finch NZD 50</span><span class="highlight-lux">精品: 私人包池 NZD 150 · Pullman NZD 380 · Paragon NZD 100</span>',w:null,p:null,l:'https://polynesianspa.co.nz'}
-  ]},
-  {day:3,title:'南下惠灵顿 · 渡轮准备',loc:'罗托鲁瓦 → 惠灵顿',drive:'约 460km · 5h',costKey:'d3',acts:[
-    {t:'全天',n:'沿 SH1 南下',d:'途经陶波湖停车拍照（30min），建议早 8 点出发。',w:'今天开车最多，保持精力',p:null,l:null},
-    {t:'下午',n:'Te Papa 博物馆',d:'免费入场，毛利文化藏品一流。',w:null,p:null,l:'https://tepapa.govt.nz'},
-    {t:'晚上',n:'古巴街觅食 + 入住',d:'<span class="highlight-budget">经济: Midnight Espresso NZD 20 · YHA Wellington NZD 45</span><span class="highlight-mid">舒适: Ombra Wine Bar NZD 60 · CityLife Wellington NZD 220</span><span class="highlight-lux">精品: Logan Brown NZD 120 · InterContinental NZD 420</span>',w:'明天渡轮 08:25，今晚必须住市区',p:null,l:null}
-  ]},
-  {day:4,title:'渡轮过库克海峡 · 马尔堡',loc:'惠灵顿 → 皮克顿 → 马尔堡',drive:'渡轮 3h + 车程 45min',costKey:null,acts:[
-    {t:'07:30',n:'Interislander 渡轮登船',d:'码头在 Waterloo Quay，连车一起上船。NZD 120/人起。',w:'提前网上购票，旺季涨价快',p:null,l:'https://www.interislander.co.nz'},
-    {t:'11:30',n:'抵达皮克顿',d:'库克海峡风景极美，甲板上看峡湾。',w:null,p:'在渡轮上吃午饭，船上有餐厅',l:null},
-    {t:'下午',n:'马尔堡葡萄酒庄',d:'Brancott Estate 免费参观，品酒 NZD 10。',w:null,p:null,l:'https://brancottestate.com'}
-  ]},
-  {day:5,title:'基督城 · 南岛门户',loc:'马尔堡 → 基督城',drive:'约 350km · 4h',costKey:null,acts:[
-    {t:'途中',n:'凯库拉停留',d:'海边小镇，运气好看海豚，停 30 分钟拍照。',w:null,p:'秋冬季鲸鱼观赏 99% 能看到',l:null},
-    {t:'下午',n:'纸板大教堂',d:'2011 年地震后日本设计师坂茂的作品，免费入场。',w:null,p:null,l:null},
-    {t:'傍晚',n:'坎特伯雷博物馆',d:'免费入场，南极探险厅非常值得看。',w:null,p:null,l:'https://canterburymuseum.com'}
-  ]},
-  {day:6,title:'蒂卡波湖 · 星空小镇',loc:'基督城 → 蒂卡波',drive:'约 225km · 2.5h',costKey:'d6',acts:[
-    {t:'下午',n:'好牧羊人教堂',d:'奶蓝色湖水，随手一拍都是明信片。',w:null,p:null,l:null},
-    {t:'下午',n:'约翰山 Astro Café',d:'俯瞰全湖，咖啡很好喝。',w:'上山路极窄，会车需让行',p:null,l:null},
-    {t:'晚上',n:'Dark Sky Project 观星 + 入住',d:'<span class="highlight-budget">经济: 观星 NZD 165 · Takapo YHA NZD 35（观星是今日最大支出，提前预留）</span><span class="highlight-mid">舒适: 观星含温泉 NZD 165 · Peppers Bluewater NZD 220</span><span class="highlight-lux">精品: 观星含温泉 NZD 165 · Bluewater Lakehouse NZD 450</span>',w:'提前 3 天预订，云天取消',p:null,l:'https://darkskyproject.co.nz'}
-  ]},
-  {day:7,title:'库克山 · 冰湖徒步',loc:'蒂卡波 → 库克山',drive:'约 105km · 1.5h',costKey:'d7',acts:[
-    {t:'途中',n:'普卡基湖停留',d:'颜色比蒂卡波更蓝，人更少，停 30 分钟必拍。',w:null,p:'逆光午后拍出来最美',l:null},
-    {t:'下午',n:'Hooker Valley Track',d:'来回 10km 约 3h，终点冰湖直对库克山冰川，全程平坦。',w:'带足水和零食，山上无补给',p:null,l:'https://www.doc.govt.nz'},
-    {t:'晚上',n:'Hermitage 晚餐 + 入住',d:'<span class="highlight-budget">经济: Hermitage 餐厅 NZD 60 · Aoraki Court Motel NZD 120</span><span class="highlight-mid">舒适: Hermitage 精选菜单 NZD 80 · The Hermitage NZD 280</span><span class="highlight-lux">精品: Hermitage 高级套餐 NZD 120 · 套房 NZD 550</span>',w:'旺季提前预订，唯一像样的餐厅',p:null,l:'https://www.hermitage.co.nz'}
-  ]},
-  {day:8,title:'瓦纳卡 · 孤树打卡',loc:'库克山 → 瓦纳卡',drive:'约 260km · 3h',costKey:'d8',acts:[
-    {t:'途中',n:'克伦威尔车厘子',d:'4-5 月正当季，路边农场现摘，比国内便宜很多。',w:null,p:'买一大袋带走',l:null},
-    {t:'下午',n:'瓦纳卡湖孤树',d:'新西兰出镜率最高的树，早晨或傍晚光线最好。',w:'禁止入湖攀爬',p:null,l:null},
-    {t:'晚上',n:'入住瓦纳卡',d:'<span class="highlight-budget">经济: Wanaka Bakpaka NZD 40</span><span class="highlight-mid">舒适: Wanaka Hotel NZD 200</span><span class="highlight-lux">精品: Mahu Whenua Lodge NZD 900（全球顶级生态酒店，需提前数月预订）</span>',w:null,p:null,l:null}
-  ]},
-  {day:9,title:'皇后镇 · 极限体验',loc:'瓦纳卡 → 皇后镇',drive:'约 70km · 1h',costKey:'d9',acts:[
-    {t:'上午',n:'皇冠山路',d:'险但风景绝美，需晴天。能见度低时走 Cromwell 平路。',w:'路窄弯急，新手慎行',p:null,l:null},
-    {t:'下午',n:'蹦极 / 跳伞',d:'Kawarau Bridge 蹦极 NZD 250；15,000 英尺跳伞 NZD 399。',w:null,p:'提前 2 天预订，天气取消可退款',l:'https://bungy.co.nz'},
-    {t:'晚上',n:'皇后镇晚餐 + 入住',d:'<span class="highlight-budget">经济: Fergburger NZD 15 · Base Queenstown NZD 45</span><span class="highlight-mid">舒适: Botswana Butchery NZD 80 · Novotel NZD 250</span><span class="highlight-lux">精品: Rata Restaurant（米其林级）NZD 130 · The Rees Hotel NZD 600</span>',w:null,p:null,l:null}
-  ]},
-  {day:10,title:'还车 · 飞出',loc:'皇后镇机场 飞出',drive:'',costKey:null,acts:[
-    {t:'早上',n:'还车',d:'皇后镇机场各大租车公司都有柜台，提前 30min 到。',w:'检查油箱加满，亏油罚款贵',p:null,l:null},
-    {t:'上午',n:'格林诺基（可选）',d:'《魔戒》拍摄地，离皇后镇 45min，湖光山色极美。',w:null,p:null,l:null},
-    {t:'飞出',n:'皇后镇 → 转机回程',d:'多数需经奥克兰或悉尼中转，注意国内段行李 23kg 限制。',w:null,p:null,l:null}
-  ]}
-];
+  // 3. 动态生成行程数组
+  var daysHtml = '';
+  for(let i=1; i<=days; i++) {
+    // 根据交通方式生成起手式
+    let t1, n1, d1, w1;
+    if(i === 1) {
+      t1 = '上午'; n1 = `抵达 ${dest}`;
+      if(S.transit === 'drive') { d1 = '机场取车柜台办理提车。'; w1 = '仔细检查车身划痕并拍照留存'; }
+      else if(S.transit === 'public') { d1 = '乘坐机场快线或接驳巴士前往市区。'; w1 = '不要坐黑车，认准官方标识'; }
+      else { d1 = '专属包车司机在接机口举牌等候。'; w1 = '提前核对司机车牌号'; }
+    } else {
+      t1 = '09:30'; n1 = '核心街区探索 / 景点打卡'; d1 = `游览 ${dest} 当地特色区域，感受风土人情。`; w1 = null;
+    }
 
-// Budget cost per day
-var DAYCOST={
-  budget:{d1:'NZD 120',d2:'NZD 150',d3:'NZD 100',d6:'NZD 220',d7:'NZD 180',d8:'NZD 80',d9:'NZD 320'},
-  mid:{d1:'NZD 250',d2:'NZD 350',d3:'NZD 300',d6:'NZD 420',d7:'NZD 380',d8:'NZD 220',d9:'NZD 550'},
-  lux:{d1:'NZD 450',d2:'NZD 650',d3:'NZD 580',d6:'NZD 680',d7:'NZD 720',d8:'NZD 950',d9:'NZD 1,150'}
-};
+    // 动态估算价格 (双币种)
+    let baseCost = S.budget === 'budget' ? 30 : (S.budget === 'mid' ? 80 : 150);
+    let lCurr = Math.floor(baseCost * (Math.random() + 0.8));
+    let rmb = Math.floor(lCurr * 4.5); // 假装汇率
+    let costTag = `<span class="curr-badge">预估: ${lCurr} 当地币 (约 ¥${rmb})</span>`;
 
-var CL=[
-  {t:'中文驾照翻译件',s:'AAA 认证，在国内办好，约 ¥80，到了没法办'},
-  {t:'Interislander 渡轮',s:'提前购票，网上比现场便宜 30%，旺季 NZD 120/人起'},
-  {t:'蒂卡波 Dark Sky Project',s:'提前 3 天以上预订，选可退款套餐'},
-  {t:'皇后镇跳伞 / 蹦极',s:'提前 2 天预订，天气取消可退款'},
-  {t:'租车全险 Full Coverage',s:'新西兰山路碎石多，底盘刮伤算你的'},
-  {t:'库克山 Hermitage 晚餐',s:'旺季提前预订，唯一像样的餐厅'}
-];
+    let planBHtml = '';
+    // 如果用户担心行程太赶(pace)或不知道吃啥(food)，注入 Plan B
+    if(S.worry.includes('food')) {
+        planBHtml += `<div class="plan-b">🍲 <strong>吃货备选：</strong>如果不想吃推荐的餐厅，旁边 500 米有一家百年老字号，Google 评分 4.6 (点我查看 review)</div>`;
+    }
+    if(S.style.includes('citywalk')) {
+        planBHtml += `<div class="plan-b">☕️ <strong>躺平备选：</strong>如果走累了，可直接跳过下午行程，去市中心的咖啡馆坐一整个下午。</div>`;
+    }
 
-var BDK={
-  budget:{cats:[['🚗 交通',28,'#378ADD'],['🏠 住宿',38,'#1D9E75'],['🎢 体验',22,'#BA7517'],['🍔 餐饮',12,'#993C1D']],note:'平均每日 NZD 140。Day 6（观星 NZD 165）和 Day 9（蹦极/跳伞 NZD 250-399）是高峰日，提前预留。'},
-  mid:{cats:[['🚗 交通',30,'#378ADD'],['🏠 住宿',40,'#1D9E75'],['🎢 体验',20,'#BA7517'],['🍔 餐饮',10,'#993C1D']],note:'平均每日 NZD 240。住宿占大头，建议出发前全程锁定，旺季价格浮动大。'},
-  lux:{cats:[['🚗 交通',20,'#378ADD'],['🏠 住宿',45,'#1D9E75'],['🎢 体验',25,'#BA7517'],['🍔 餐饮',10,'#993C1D']],note:'平均每日 NZD 420。Mahu Whenua Lodge（Day 8）需提前数月预订，额满即止。'}
-};
-
-var BM={budget:{v:'NZD 1,400–1,800',s:'10天 · 经济型'},mid:{v:'NZD 2,200–2,800',s:'10天 · 舒适型'},lux:{v:'NZD 4,000+',s:'10天 · 精品型'}};
-
-var CF={
-  road:'Day 3 Interislander 渡轮最早班 08:25，建议 Day 2 晚在惠灵顿市区住宿，不要选机场酒店。',
-  nature:'Day 4 汤加里罗穿越后 Day 5 需早起赶渡轮，腿会非常酸。建议 Day 3 住 Tongariro 而非 Taupo。',
-  couple:'蒂卡波观星（Day 6）是绝佳求婚地点，Hermitage（Day 7）可提前安排惊喜晚餐，两处均需提前 2 周预订。',
-  photo:'瓦纳卡孤树最佳拍摄：清晨 6-8 点或傍晚 6-8 点。Day 8 必须在瓦纳卡过夜，不要当天来回皇后镇。'
-};
-
-var TAGS={
-  road:[['自驾为主','tg'],['南北岛连游','tb'],['渡轮过海峡','ta'],['奥克兰进·皇后镇出','tc']],
-  nature:[['深度徒步','tg'],['火山+峡湾','tb'],['含水上巴士','ta'],['自然系首选','tc']],
-  couple:[['情侣专属','tg'],['精品住宿','tb'],['求婚胜地','ta'],['米其林餐厅','tc']],
-  photo:[['摄影优先','tg'],['孤树+冰湖','tb'],['星空大片','ta'],['最佳光线指引','tc']]
-};
-
-var LUG={
-  road:[
-    {c:'👗 衣物',i:['冲锋衣（防风雨）','抓绒中层','轻薄羽绒','长裤×2','速干T恤×3','保暖内衣','泳衣','帽子+手套']},
-    {c:'👟 鞋包',i:['登山鞋/徒步鞋','轻便运动鞋','拖鞋','日用背包（20L）','防水收纳袋']},
-    {c:'🧴 洗护',i:['防晒霜SPF50+','润唇膏','保湿面霜','洗漱套装','湿纸巾']},
-    {c:'📱 数码',i:['充电宝（20000mAh）','Type I转换插头（新西兰专用）','相机+备用电池','手机三脚架']},
-    {c:'📋 证件药品',i:['护照（有效期>6月）','中文驾照+翻译件','国际信用卡','急救包','晕车药','感冒药','肠胃药']}
-  ],
-  nature:[
-    {c:'👗 衣物',i:['冲锋衣（防风雨，必备）','抓绒中层','保暖内衣','速干长裤×2','速干T恤×3','毛线帽+手套+围巾','泳衣（温泉用）']},
-    {c:'🥾 徒步装备',i:['登山鞋（高帮，防扭伤）','徒步杖（可折叠）','日用背包（25-30L）','2L水袋/水壶','能量棒/行动粮','头灯']},
-    {c:'🧴 洗护',i:['防晒霜SPF50+','防虫喷雾','唇膏','保湿霜']},
-    {c:'📱 数码',i:['充电宝','Type I转换插头','离线地图（Maps.me）','相机防雨罩']},
-    {c:'📋 证件药品',i:['护照','中文驾照+翻译件','信用卡','水泡贴（脚必用）','止痛药','感冒药','急救包']}
-  ]
-};
-
-function generate(){
-  var style=S.style,budget=S.budget,b=BM[budget];
-  // 埋点2: 用户点击生成行程
-  sendToSheet({type:'generated',style:style,who:S.who,worry:S.worry,budget:budget});
-  document.body.className='budget-'+budget;
-  document.getElementById('rtitle').textContent='新西兰 10 天 · '+{road:'公路自驾版',nature:'自然深度版',couple:'情侣浪漫版',photo:'摄影打卡版'}[style];
-  document.getElementById('rsub').textContent='奥克兰飞入 → 北岛精华 → 渡轮过海峡 → 南岛大环线 → 皇后镇飞出';
-  document.getElementById('rbudget').textContent=b.v;
-  document.getElementById('rbudgetsub').textContent=b.s;
-  document.getElementById('rconflict').textContent=CF[style]||CF.road;
-  document.getElementById('rtags').innerHTML=(TAGS[style]||TAGS.road).map(function(t){return '<span class="tag '+t[1]+'">'+t[0]+'</span>';}).join('');
-  var bk=BDK[budget];
-  document.getElementById('rbars').innerHTML=bk.cats.map(function(c){return '<div class="bdrow"><div class="bdcat">'+c[0]+'</div><div class="bdtrack"><div class="bdfill" style="width:'+c[1]+'%;background:'+c[2]+'"></div></div><div class="bdpct">'+c[1]+'%</div></div>';}).join('');
-  document.getElementById('rdaily').textContent=bk.note;
-  var wt=WORRYTEXT[S.worry];
-  document.getElementById('worrybanner').innerHTML=wt?'<div style="background:var(--bl);border:1px solid rgba(55,138,221,.2);border-radius:var(--rs);padding:12px 16px;margin-bottom:1.5rem;font-size:13px;color:var(--bd);line-height:1.55;">'+wt+'</div>':'';
-  document.getElementById('rdays').innerHTML=DAYS.map(function(day){
-    var costLabel=day.costKey&&DAYCOST[budget][day.costKey]?'💰 今日约 '+DAYCOST[budget][day.costKey]:'';
-    var tl=day.acts.map(function(a,i){
-      var last=i===day.acts.length-1;
-      var dot='tldot'+(a.w?' w':'');
-      var badges='';
-      if(a.w) badges+='<span class="tlwarn">注意 · '+a.w+'</span> ';
-      if(a.p) badges+='<span class="tltip">Tips · '+a.p+'</span> ';
-      if(a.l) badges+='<a class="tllink" href="'+a.l+'" target="_blank">立即预订 →</a>';
-      return '<div class="tli"><div class="tll"><div class="'+dot+'"></div>'+(last?'':'<div class="tlline"></div>')+'</div><div class="tlb"><div class="tltime">'+a.t+'</div><div class="tlname">'+a.n+'</div><div class="tldet">'+a.d+'</div>'+(badges?'<div style="margin-top:4px;">'+badges+'</div>':'')+'</div></div>';
-    }).join('');
-    return '<div class="dc"><div class="dh"><span class="db">Day '+day.day+'</span><span class="dt">'+day.title+'</span></div><div class="dm">'+day.loc+'</div>'+(day.drive?'<span class="dtag">🚗 '+day.drive+'</span>':'')+(costLabel?'<span class="dcost">'+costLabel+'</span>':'')+'<div class="tl">'+tl+'</div></div>';
-  }).join('');
-  var lugKey=(style==='nature'||style==='photo')?'nature':'road';
-  document.getElementById('rluggage').innerHTML=LUG[lugKey].map(function(cat){
-    return '<div class="lugcat"><div class="lugcattitle">'+cat.c+'</div><div class="lugitems">'+cat.i.map(function(item){return '<div class="lugitem" onclick="this.classList.toggle(\'chk\')">'+item+'</div>';}).join('')+'</div></div>';
-  }).join('');
-  document.getElementById('rchecklist').innerHTML=CL.map(function(c){
-    return '<div class="chi"><div class="chbox"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#1D9E75" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><div class="chtext">'+c.t+'</div><div class="chsub">'+c.s+'</div></div></div>';
-  }).join('');
+    daysHtml += `
+    <div class="dc">
+      <div class="dh"><span class="db">Day ${i}</span><span class="dt">${dest} · 行程执行</span></div>
+      <a href="#" class="map-link">📍 一键查看今日 Google Maps 连线 (需高阶版)</a>
+      <div class="tl">
+        <div class="tli"><div class="tll"><div class="tldot"></div><div class="tlline"></div></div>
+          <div class="tlb">
+            <div class="tltime">${t1}</div><div class="tlname">${n1}</div><div class="tldet">${d1}</div>
+            ${w1 ? `<span class="curr-badge" style="background:var(--al);color:var(--amber);">注意: ${w1}</span>` : ''}
+          </div>
+        </div>
+        <div class="tli"><div class="tll"><div class="tldot"></div><div class="tlline"></div></div>
+          <div class="tlb">
+            <div class="tltime">12:30</div><div class="tlname">午餐与休息</div>
+            <div class="tldet">体验当地特色美食，餐厅氛围轻松。${costTag}</div>
+            ${planBHtml}
+          </div>
+        </div>
+        <div class="tli"><div class="tll"><div class="tldot"></div></div>
+          <div class="tlb">
+            <div class="tltime">15:00</div><div class="tlname">下午深度体验</div>
+            <div class="tldet">根据你选择的【${S.style.map(s=>({citywalk:'慢游',nature:'自然',rush:'特种兵',road:'公路'})[s]||'特色'}.join('/')}】风格，安排对应的沉浸式活动。</div>
+            <a class="tllink" href="#">查看预订链接 →</a>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+  
+  document.getElementById('rdays').innerHTML = daysHtml;
+  
+  // 切换屏幕
   document.getElementById('s1').classList.remove('active');
   document.getElementById('s2').classList.add('active');
   window.scrollTo(0,0);
-  // 开始监听下载门槛是否进入视口
-  setTimeout(watchGate, 300);
-}
-
-function goBack(){document.getElementById('s2').classList.remove('active');document.getElementById('s1').classList.add('active');window.scrollTo(0,0);}
-
-function sendToSheet(data){
-  if(SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE') return;
-  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)}).catch(function(){});
-}
-
-function submitDL(){
-  var pain=document.getElementById('pain').value.trim();
-  if(!pain){document.getElementById('pain').style.borderColor='#E24B4A';document.getElementById('pain').focus();return;}
-  sendToSheet({type:'main',style:S.style,who:S.who,worry:S.worry,budget:S.budget,pain:pain,ts:new Date().toISOString()});
-  document.getElementById('gatef').style.display='none';
-  document.getElementById('gsuccess').innerHTML='<div style="background:var(--tl);border:1px solid rgba(29,158,117,.3);border-radius:var(--r);padding:16px 20px;text-align:center;margin-top:1.5rem;"><div style="font-size:15px;font-weight:600;color:var(--td);">✓ 感谢你的回答！行程正在下载...</div></div>';
-  document.getElementById('gsuccess').style.display='block';
-  setTimeout(function(){window.print();setTimeout(function(){document.getElementById('s2').classList.remove('active');document.getElementById('s3').classList.add('active');window.scrollTo(0,0);},1500);},600);
-}
-
-var vDest=null;
-function vd(el){document.querySelectorAll('.dbtn').forEach(function(b){b.classList.remove('sel');});el.classList.add('sel');vDest=el.textContent;}
-
-function submitRemind(){
-  var d=document.getElementById('ddate').value,c=document.getElementById('dcontact').value.trim();
-  if(!d||!c){alert('请填写出发日期和联系方式');return;}
-  sendToSheet({type:'remind',date:d,contact:c,ts:new Date().toISOString()});
-  var b=document.getElementById('rbtn');b.textContent='✓ 已预约，我们会提前联系你';b.className='hsub done';b.disabled=true;
-}
-
-function submitCollab(){
-  var c=document.getElementById('ccontact').value.trim();
-  if(!c){alert('请填写联系方式');return;}
-  sendToSheet({type:'collab',contact:c,ts:new Date().toISOString()});
-  var b=document.getElementById('cbtn');b.textContent='✓ 已加入候补名单';b.className='hsub done';b.disabled=true;
-}
-
-function submitVote(){
-  if(!vDest){alert('请先选择一个目的地');return;}
-  sendToSheet({type:'vote',dest:vDest,ts:new Date().toISOString()});
-  var b=document.getElementById('vbtn');b.textContent='✓ 已投票，'+vDest+'版本优先上线！';b.className='hsub done';b.disabled=true;
 }
 </script>
 </body>
