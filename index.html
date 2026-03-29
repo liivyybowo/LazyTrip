@@ -3,307 +3,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LazyTrip · 全球旅行攻略生成器</title>
+<title>LazyTrip · 新西兰 10 天行程生成器</title>
 <style>
 :root{--bg:#FAFAF8;--surface:#fff;--surface2:#F4F3EF;--border:rgba(0,0,0,0.1);--border-md:rgba(0,0,0,0.18);--text:#1A1A18;--text2:#5A5A55;--text3:#999890;--teal:#1D9E75;--tl:#E1F5EE;--td:#0F6E56;--blue:#378ADD;--bl:#E6F1FB;--bd:#185FA5;--amber:#BA7517;--al:#FAEEDA;--coral:#993C1D;--cl:#FAECE7;--purple:#534AB7;--pl:#EEEDFE;--pd:#3C3489;--rl:#FCEBEB;--red:#A32D2D;--rb:#F09595;--r:12px;--rs:8px;}
-*{box-sizing:border-box;margin:0;padding:0;}
+{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;}
 .page{max-width:680px;margin:0 auto;padding:2rem 1.25rem 4rem;}
 .screen{display:none;}.screen.active{display:block;}
 .hdr{text-align:center;padding:2.5rem 0 2rem;border-bottom:.5px solid var(--border);margin-bottom:2rem;}
 .hdr h1{font-size:24px;font-weight:600;letter-spacing:-.3px;margin-bottom:6px;}
 .hdr p{font-size:15px;color:var(--text2);max-width:420px;margin:0 auto;}
+.flag{font-size:28px;display:block;margin-bottom:10px;}
 .brand{font-size:12px;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:block;}
 .pbar{display:flex;gap:6px;margin-bottom:2rem;}
 .ps{flex:1;height:3px;background:var(--border);border-radius:2px;transition:background .3s;}
 .ps.done{background:var(--teal);}.ps.act{background:var(--teal);opacity:.5;}
-.slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:1.75rem;font-weight:600;}
-.slabel span.hint{text-transform:none;letter-spacing:normal;font-weight:400;color:var(--amber);margin-left:6px;background:var(--al);padding:2px 6px;border-radius:4px;}
-
-/* Inputs */
-.input-row{display:flex;gap:10px;margin-bottom:.5rem;}
-.text-input{flex:2;padding:14px;border-radius:var(--rs);border:1px solid var(--border-md);font-size:15px;font-family:inherit;outline:none;transition:border-color .2s;}
-.text-input:focus{border-color:var(--teal);}
-.num-input{flex:1;padding:14px;border-radius:var(--rs);border:1px solid var(--border-md);font-size:15px;font-family:inherit;outline:none;}
-
+.slabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;margin-top:1.75rem;font-weight:500;}
 .og{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:.5rem;}
-@media(min-width:480px){.og.four{grid-template-columns:repeat(4,1fr);}.og.three{grid-template-columns:repeat(3,1fr);}}
-.oc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:all .15s;}
+@media(min-width:480px){.og.four{grid-template-columns:repeat(4,1fr);}}
+.oc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;}
 .oc:hover{border-color:var(--border-md);background:var(--surface2);}
 .oc.st{border:1.5px solid var(--teal);background:var(--tl);}.oc.st .ot{color:var(--td);}
 .oc.sb{border:1.5px solid var(--blue);background:var(--bl);}.oc.sb .ot{color:var(--bd);}
 .oi{font-size:22px;margin-bottom:8px;display:block;}
 .ot{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
-.od{font-size:12px;color:var(--text2);line-height:1.4;}
-
-.btn{width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:2rem;}
+.od{font-size:12px;color:var(--text2);line-height:1.5;}
+.br{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.bc{background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;cursor:pointer;text-align:center;transition:border-color .15s;}
+.bc:hover{border-color:var(--border-md);}
+.bc.sb{border:1.5px solid var(--blue);background:var(--bl);}.bc.sb .ot{color:var(--bd);}
+.bp{font-size:13px;color:var(--text2);margin-top:3px;}
+.btn{width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:var(--r);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s;margin-top:1.75rem;}
 .btn:hover{opacity:.85;}.btn:disabled{opacity:.3;cursor:not-allowed;}
 .btn.teal{background:var(--teal);margin-top:0;}.btn.teal:hover{opacity:.9;}
 .back{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);cursor:pointer;margin-bottom:1.5rem;padding:6px 0;border:none;background:none;}
 .back:hover{color:var(--text);}
-
-/* Step 0 Module */
-.step0-box{background:var(--surface);border:1.5px dashed var(--amber);border-radius:var(--r);padding:18px;margin-bottom:1.5rem;position:relative;overflow:hidden;}
-.step0-box::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:var(--amber);}
-.s0-title{font-size:15px;font-weight:600;color:var(--text);margin-bottom:12px;display:flex;align-items:center;gap:6px;}
-.s0-grid{display:grid;grid-template-columns:1fr;gap:12px;}
-@media(min-width:480px){.s0-grid{grid-template-columns:1fr 1fr;}}
-.s0-card{background:var(--bg);border:1px solid var(--border);border-radius:var(--rs);padding:12px;}
-.s0-card-tl{font-size:12px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;}
-.s0-fund{background:var(--al);border:1px solid rgba(186,117,23,.2);border-radius:var(--rs);padding:12px;margin-top:12px;}
-.s0-fund-tl{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px;}
-.s0-fund-desc{font-size:12px;color:var(--text2);line-height:1.5;}
-
+.tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 1.5rem;}
+.tag{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;}
+.tg{background:var(--tl);color:var(--td);}.tb{background:var(--bl);color:var(--bd);}
+.ta{background:var(--al);color:var(--amber);}.tc{background:var(--cl);color:var(--coral);}
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+.sc{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;}
+.sl{font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;}
+.sv{font-size:17px;font-weight:600;color:var(--text);}
+.ss{font-size:11px;color:var(--text2);margin-top:2px;}
+.bdown{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:1.5rem;}
+.bdl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:14px;}
+.bdbars{display:flex;flex-direction:column;gap:9px;margin-bottom:12px;}
+.bdrow{display:flex;align-items:center;gap:10px;}
+.bdcat{font-size:13px;color:var(--text2);min-width:70px;flex-shrink:0;}
+.bdtrack{flex:1;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;}
+.bdfill{height:100%;border-radius:3px;}
+.bdpct{font-size:12px;color:var(--text3);min-width:32px;text-align:right;}
+.bdnote{font-size:12px;color:var(--text3);border-top:.5px solid var(--border);padding-top:10px;line-height:1.6;}
+.cbox{background:var(--rl);border:1px solid var(--rb);border-radius:var(--rs);padding:12px 16px;margin-bottom:1.5rem;}
+.ct{font-size:13px;font-weight:600;color:var(--red);margin-bottom:4px;}
+.cd{font-size:13px;color:#791F1F;line-height:1.55;}
 .dc{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;}
 .dh{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
 .db{background:var(--surface2);border-radius:6px;padding:3px 10px;font-size:12px;color:var(--text2);font-weight:600;}
 .dt{font-size:15px;font-weight:600;color:var(--text);}
-.map-link{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--bd);background:var(--bl);padding:4px 10px;border-radius:20px;text-decoration:none;margin-bottom:12px;font-weight:500;}
-
+.dm{font-size:13px;color:var(--text3);margin-bottom:10px;}
+.dtag{display:inline-block;font-size:12px;background:var(--bl);color:var(--bd);border-radius:4px;padding:3px 8px;margin-bottom:8px;font-weight:500;}
+.dcost{display:inline-block;font-size:12px;background:var(--tl);color:var(--td);border-radius:4px;padding:3px 8px;margin-bottom:12px;margin-left:6px;font-weight:500;}
 .tl{padding-top:10px;border-top:.5px solid var(--border);}
 .tli{display:flex;gap:0;}
 .tll{display:flex;flex-direction:column;align-items:center;width:32px;flex-shrink:0;}
-.tldot{width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--teal);margin-top:4px;}
+.tldot{width:10px;height:10px;border-radius:50%;background:var(--teal);border:2px solid var(--surface);box-shadow:0 0 0 1.5px var(--teal);margin-top:4px;flex-shrink:0;}
+.tldot.w{background:var(--amber);box-shadow:0 0 0 1.5px var(--amber);}
 .tlline{width:1.5px;background:var(--border);flex:1;margin:3px 0;}
 .tlb{flex:1;padding-bottom:14px;min-width:0;}
 .tltime{font-size:11px;color:var(--text3);margin-bottom:2px;margin-top:2px;}
 .tlname{font-size:14px;font-weight:600;color:var(--text);}
 .tldet{font-size:13px;color:var(--text2);line-height:1.55;margin-top:2px;}
-
-/* Plan B & Dual Currency styling */
-.plan-b{margin-top:6px;padding:8px 10px;background:var(--surface2);border-left:3px solid var(--border-md);border-radius:0 4px 4px 0;font-size:12px;color:var(--text2);}
-.curr-badge{display:inline-block;font-size:11px;background:var(--cl);color:var(--coral);border-radius:4px;padding:2px 6px;margin-top:4px;font-weight:500;}
+.tlwarn{display:inline-block;font-size:11px;background:var(--al);color:var(--amber);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;}
+.tltip{display:inline-block;font-size:11px;background:var(--tl);color:var(--td);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;}
 .tllink{display:inline-block;font-size:11px;background:var(--bl);color:var(--bd);border-radius:4px;padding:2px 8px;margin-top:5px;font-weight:600;text-decoration:none;}
-
+.lugcat{margin-bottom:1rem;}
+.lugcattitle{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.lugitems{display:flex;flex-wrap:wrap;gap:6px;}
+.lugitem{font-size:12px;background:var(--surface2);border:.5px solid var(--border);border-radius:20px;padding:4px 12px;color:var(--text2);cursor:pointer;transition:all .15s;}
+.lugitem:hover{border-color:var(--border-md);}
+.lugitem.chk{background:var(--tl);border-color:var(--teal);color:var(--td);text-decoration:line-through;}
+.chklist{margin-bottom:1.5rem;}
+.chi{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:.5px solid var(--border);}
+.chi:last-child{border-bottom:none;}
+.chbox{width:18px;height:18px;border:1.5px solid var(--teal);border-radius:4px;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;}
+.chtext{font-size:14px;color:var(--text);font-weight:500;}
+.chsub{font-size:12px;color:var(--text2);margin-top:2px;font-weight:400;}
+/ accommodation comparison by budget /
+.accom-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px;}
+.accom-card{border-radius:var(--rs);padding:10px 12px;font-size:12px;}
+.accom-budget{background:#F4F3EF;border:1px solid var(--border);}
+.accom-mid{background:var(--bl);border:1px solid rgba(55,138,221,.2);}
+.accom-lux{background:#FAEEDA;border:1px solid rgba(186,117,23,.2);}
+.accom-tier{font-size:10px;font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em;}
+.accom-budget .accom-tier{color:var(--text3);}
+.accom-mid .accom-tier{color:var(--bd);}
+.accom-lux .accom-tier{color:var(--amber);}
+.accom-name{font-weight:600;color:var(--text);margin-bottom:2px;}
+.accom-price{color:var(--text2);}
 .gate{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-top:2rem;}
+.gttl{font-size:17px;font-weight:600;margin-bottom:6px;}
+.gsub{font-size:14px;color:var(--text2);margin-bottom:20px;line-height:1.6;}
+.glbl{font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px;}
+.gta{width:100%;border:1px solid var(--border-md);border-radius:var(--rs);padding:12px 14px;font-size:14px;color:var(--text);background:var(--bg);resize:none;height:90px;font-family:inherit;transition:border-color .15s;outline:none;}
+.gta:focus{border-color:var(--teal);}
+.ghint{font-size:12px;color:var(--text3);margin-top:6px;margin-bottom:16px;}
+.gnote{font-size:12px;color:var(--text3);text-align:center;margin-top:12px;line-height:1.6;}
+.cust{display:flex;gap:12px;align-items:flex-start;background:var(--al);border:1px solid rgba(186,117,23,.25);border-radius:var(--rs);padding:12px 14px;margin:14px 0 16px;}
+.custtl{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:3px;}
+.custd{font-size:12px;color:var(--amber);opacity:.85;line-height:1.55;}
+.thero{text-align:center;padding:1.5rem 0 1rem;}
+.thicon{font-size:40px;display:block;margin-bottom:12px;}
+.thtl{font-size:20px;font-weight:600;margin-bottom:6px;}
+.thsub{font-size:14px;color:var(--text2);line-height:1.6;}
+.hcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;margin-bottom:12px;}
+.hchdr{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;}
+.hcicon{font-size:24px;flex-shrink:0;}
+.hctitle{font-size:15px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.hcdesc{font-size:13px;color:var(--text2);line-height:1.55;}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;margin-bottom:10px;}
+.bi{background:var(--tl);color:var(--td);}.bs{background:var(--bl);color:var(--bd);}.bv{background:var(--pl);color:var(--pd);}
+.hinput{width:100%;border:1px solid var(--border-md);border-radius:var(--rs);padding:10px 14px;font-size:14px;color:var(--text);background:var(--bg);font-family:inherit;outline:none;transition:border-color .15s;margin-top:6px;}
+.hinput:focus{border-color:var(--teal);}
+.hsub{margin-top:10px;padding:10px 20px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.hsub:hover{opacity:.85;}.hsub.done{background:var(--teal);cursor:default;}
+.dgrid{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.dbtn{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 14px;font-size:13px;cursor:pointer;transition:all .15s;color:var(--text);}
+.dbtn:hover{border-color:var(--border-md);}.dbtn.sel{background:var(--pl);border-color:var(--purple);color:var(--pd);font-weight:600;}
+hr{border:none;border-top:.5px solid var(--border);margin:1.75rem 0;}
 .fnote{text-align:center;font-size:12px;color:var(--text3);padding-top:2rem;line-height:1.7;}
+/ budget-specific highlight in accom */
+.highlight-budget{display:none;}.highlight-mid{display:none;}.highlight-lux{display:none;}
+body.budget-budget .highlight-budget{display:block;}
+body.budget-mid .highlight-mid{display:block;}
+body.budget-lux .highlight-lux{display:block;}
+@media print{.back,.gate,#gsuccess,#s3,.btn,.lugitem{display:none!important;}body{background:white;}.dc{break-inside:avoid;}}
 </style>
 </head>
 <body>
 <div class="page">
-
-<div id="s1" class="screen active">
-<div class="hdr">
-  <span class="brand">LazyTrip MVP v2.0</span>
-  <h1>全球旅行结构化看板生成器</h1>
-  <p>告诉我你的旅行方式，生成一份真正能执行的行程</p>
-</div>
-<div class="pbar"><div class="ps act" id="p1"></div><div class="ps" id="p2"></div><div class="ps" id="p3"></div><div class="ps" id="p4"></div></div>
-
-<div class="slabel">去哪里？去几天？</div>
-<div class="input-row">
-  <input type="text" id="idest" class="text-input" placeholder="例如：清迈 / 冰岛 / 大理" oninput="checkBtn()">
-  <input type="number" id="idays" class="num-input" placeholder="天数" value="5" min="1" max="30" oninput="checkBtn()">
-</div>
-
-<div class="slabel">旅行风格 <span class="hint">多选</span></div>
-<div class="og four">
-  <div class="oc" data-g="style" data-v="citywalk" onclick="selMulti(this, 'style')"><span class="oi">☕️</span><div class="ot">慢游乱逛</div><div class="od">睡到自然醒，走街串巷</div></div>
-  <div class="oc" data-g="style" data-v="nature" onclick="selMulti(this, 'style')"><span class="oi">⛰️</span><div class="ot">自然深度</div><div class="od">徒步、国家公园</div></div>
-  <div class="oc" data-g="style" data-v="rush" onclick="selMulti(this, 'style')"><span class="oi">🎒</span><div class="ot">特种兵打卡</div><div class="od">高效率跑点，极致性价比</div></div>
-  <div class="oc" data-g="style" data-v="road" onclick="selMulti(this, 'style')"><span class="oi">🚗</span><div class="ot">公路旅行</div><div class="od">在路上，换景频繁</div></div>
-</div>
-
-<div class="slabel">交通偏好 <span class="hint">单选，决定第一天行程起手式</span></div>
-<div class="og three">
-  <div class="oc" data-g="transit" data-v="drive" onclick="selSingle(this, 'transit')"><span class="oi">🚗</span><div class="ot">全程自驾</div></div>
-  <div class="oc" data-g="transit" data-v="public" onclick="selSingle(this, 'transit')"><span class="oi">🚇</span><div class="ot">公交+打车</div></div>
-  <div class="oc" data-g="transit" data-v="charter" onclick="selSingle(this, 'transit')"><span class="oi">🚐</span><div class="ot">包车定制</div></div>
-</div>
-
-<div class="slabel">你最担心的痛点 <span class="hint">多选，系统会针对性防雷</span></div>
-<div class="og four">
-  <div class="oc" data-g="worry" data-v="budget" onclick="selMulti(this, 'worry')"><span class="oi">💸</span><div class="ot">超支糊涂账</div></div>
-  <div class="oc" data-g="worry" data-v="logistics" onclick="selMulti(this, 'worry')"><span class="oi">🗺️</span><div class="ot">交通出错</div></div>
-  <div class="oc" data-g="worry" data-v="booking" onclick="selMulti(this, 'worry')"><span class="oi">📅</span><div class="ot">没票/关门</div></div>
-  <div class="oc" data-g="worry" data-v="food" onclick="selMulti(this, 'worry')"><span class="oi">😩</span><div class="ot">每天吃啥</div></div>
-</div>
-
-<div class="slabel">预算偏好（不含往返大交通）</div>
-<div class="og three">
-  <div class="oc" data-g="budget" data-v="budget" onclick="selSingle(this, 'budget', true)"><div class="ot">经济型</div><div class="od">青旅/快捷 + 街边小吃</div></div>
-  <div class="oc" data-g="budget" data-v="mid" onclick="selSingle(this, 'budget', true)"><div class="ot">舒适型</div><div class="od">3-4星级 + 特色餐厅</div></div>
-  <div class="oc" data-g="budget" data-v="lux" onclick="selSingle(this, 'budget', true)"><div class="ot">精品型</div><div class="od">奢华酒店 + 米其林体验</div></div>
-</div>
-
-<button class="btn" id="gbtn" onclick="generate()">生成我的全局控制面板 →</button>
-<p class="fnote">完全本地生成 · 体验秒级响应的结构化结果</p>
-</div>
-
-<div id="s2" class="screen">
-<button class="back" onclick="goBack()">← 返回修改需求</button>
-<div style="margin-bottom:1.5rem;">
-  <h2 id="rtitle" style="font-size:22px;font-weight:700;letter-spacing:-.3px;"></h2>
-  <p id="rsub" style="font-size:14px;color:var(--text2);margin-top:4px;"></p>
-</div>
-
-<div class="step0-box">
-  <div class="s0-title">🎒 Step 0: 签证与启动资金池</div>
-  <div class="s0-grid">
-    <div class="s0-card">
-      <div class="s0-card-tl">行前准备清单</div>
-      <div style="font-size:13px;color:var(--text2);line-height:1.6;" id="rprep">
-        </div>
-    </div>
-  </div>
-  <div class="s0-fund">
-    <div class="s0-fund-tl">💡 旅行储蓄挑战：日常外卖降级</div>
-    <div class="s0-fund-desc">从今天起至出发前，将单次餐饮/外卖控制在 ¥50 内。把省下的差额转入<strong id="rfundname">专属账户</strong>。看着资金池变大，这笔钱将成为你旅途中的专属体验基金。</div>
-  </div>
-</div>
-
-<div id="rdays"></div>
-
-<div class="gate">
-  <div class="dt" style="margin-bottom:12px;">🔒 解锁高级执行功能</div>
-  <div style="font-size:14px;color:var(--text2);margin-bottom:16px;">
-    上述为免费骨架版本。我们提供包含 <strong>真实酒店预订链接、餐厅 Google Map Review、详细双语对照表</strong> 的高阶版 Notion 模板，方便你一键复制并与好友共享编辑。
-  </div>
-  <button class="btn teal" onclick="alert('测试环境：记录用户购买意向埋点。在正式版本中，这里会跳出 9.9 元支付或留邮箱通道。')">支付 9.9 元获取完整预订版</button>
-</div>
-</div>
-
-</div>
-
-<script>
-// 全局状态
-var S = {
-  dest: '', days: 5,
-  style: [], transit: '', worry: [], budget: ''
-};
-
-function selSingle(el, group, isBudget=false) {
-  document.querySelectorAll('[data-g="'+group+'"]').forEach(c => c.classList.remove(isBudget?'sb':'st'));
-  el.classList.add(isBudget?'sb':'st');
-  S[group] = el.dataset.v;
-  checkBtn();
-}
-
-function selMulti(el, group) {
-  el.classList.toggle('st');
-  var val = el.dataset.v;
-  if (el.classList.contains('st')) {
-    S[group].push(val);
-  } else {
-    S[group] = S[group].filter(v => v !== val);
-  }
-  checkBtn();
-}
-
-function checkBtn() {
-  S.dest = document.getElementById('idest').value.trim();
-  S.days = parseInt(document.getElementById('idays').value) || 0;
-  
-  // 修复进度条显示：只要填了一个区域，进度条就会前进
-  var filled = 0;
-  if(S.dest && S.days > 0) filled++;
-  if(S.style.length > 0) filled++;
-  if(S.transit || S.worry.length > 0) filled++;
-  if(S.budget) filled++;
-
-  ['p1','p2','p3','p4'].forEach((id, i) => {
-    document.getElementById(id).className = 'ps' + (i < filled ? ' done' : i === filled ? ' act' : '');
-  });
-}
-
-function goBack() {
-  document.getElementById('s2').classList.remove('active');
-  document.getElementById('s1').classList.add('active');
-  window.scrollTo(0,0);
-}
-
-// 核心生成逻辑
-function generate() {
-  S.dest = document.getElementById('idest').value.trim();
-  
-  // 💡【核心防呆设计】点击生成时，明确告诉用户漏填了什么
-  if(!S.dest) { 
-      document.getElementById('idest').focus(); 
-      return alert("🚨 请先在最上方填写【去哪里】！"); 
-  }
-  if(S.style.length === 0) return alert("🚨 请至少选择一个【旅行风格】！");
-  if(!S.transit) return alert("🚨 请选择【交通偏好】！");
-  if(S.worry.length === 0) return alert("🚨 请至少选择一个【担心的痛点】！");
-  if(!S.budget) return alert("🚨 请选择【预算偏好】！");
-
-  var dest = S.dest;
-  var days = S.days;
-  
-  // 1. 设置标题和资金池
-  document.getElementById('rtitle').textContent = `${dest} ${days} 天 · 结构化行程控制板`;
-  document.getElementById('rsub').textContent = `基于你的 ${S.style.length} 项风格偏好与 ${S.worry.length} 项避坑要求动态生成`;
-  document.getElementById('rfundname').textContent = `【${dest}行动资金】`;
-
-  // 2. 模拟真实管家：动态生成行前准备
-  var prepHtml = `👉 签证：请查阅当地最新出入境政策<br>👉 汇率：目前约等于 1 : ${Math.floor(Math.random()*10)+2} (供参考)<br>👉 App：建议提前下载当地常用打车软件及 Google Maps`;
-  if(S.transit === 'drive') prepHtml += `<br>👉 交通：<b>务必在国内办好驾照国际翻译认证件！</b>`;
-  document.getElementById('rprep').innerHTML = prepHtml;
-
-  // 3. 动态生成行程数组
-  var daysHtml = '';
-  for(let i=1; i<=days; i++) {
-    // 根据交通方式生成起手式
-    let t1, n1, d1, w1;
-    if(i === 1) {
-      t1 = '上午'; n1 = `抵达 ${dest}`;
-      if(S.transit === 'drive') { d1 = '机场取车柜台办理提车。'; w1 = '仔细检查车身划痕并拍照留存'; }
-      else if(S.transit === 'public') { d1 = '乘坐机场快线或接驳巴士前往市区。'; w1 = '不要坐黑车，认准官方标识'; }
-      else { d1 = '专属包车司机在接机口举牌等候。'; w1 = '提前核对司机车牌号'; }
-    } else {
-      t1 = '09:30'; n1 = '核心街区探索 / 景点打卡'; d1 = `游览 ${dest} 当地特色区域，感受风土人情。`; w1 = null;
-    }
-
-    // 动态估算价格 (双币种)
-    let baseCost = S.budget === 'budget' ? 30 : (S.budget === 'mid' ? 80 : 150);
-    let lCurr = Math.floor(baseCost * (Math.random() + 0.8));
-    let rmb = Math.floor(lCurr * 4.5); // 假装汇率
-    let costTag = `<span class="curr-badge">预估: ${lCurr} 当地币 (约 ¥${rmb})</span>`;
-
-    let planBHtml = '';
-    // 如果用户担心行程太赶(pace)或不知道吃啥(food)，注入 Plan B
-    if(S.worry.includes('food')) {
-        planBHtml += `<div class="plan-b">🍲 <strong>吃货备选：</strong>如果不想吃推荐的餐厅，旁边 500 米有一家百年老字号，Google 评分 4.6 (点我查看 review)</div>`;
-    }
-    if(S.style.includes('citywalk')) {
-        planBHtml += `<div class="plan-b">☕️ <strong>躺平备选：</strong>如果走累了，可直接跳过下午行程，去市中心的咖啡馆坐一整个下午。</div>`;
-    }
-
-    daysHtml += `
-    <div class="dc">
-      <div class="dh"><span class="db">Day ${i}</span><span class="dt">${dest} · 行程执行</span></div>
-      <a href="#" class="map-link">📍 一键查看今日 Google Maps 连线 (需高阶版)</a>
-      <div class="tl">
-        <div class="tli"><div class="tll"><div class="tldot"></div><div class="tlline"></div></div>
-          <div class="tlb">
-            <div class="tltime">${t1}</div><div class="tlname">${n1}</div><div class="tldet">${d1}</div>
-            ${w1 ? `<span class="curr-badge" style="background:var(--al);color:var(--amber);">注意: ${w1}</span>` : ''}
-          </div>
-        </div>
-        <div class="tli"><div class="tll"><div class="tldot"></div><div class="tlline"></div></div>
-          <div class="tlb">
-            <div class="tltime">12:30</div><div class="tlname">午餐与休息</div>
-            <div class="tldet">体验当地特色美食，餐厅氛围轻松。${costTag}</div>
-            ${planBHtml}
-          </div>
-        </div>
-        <div class="tli"><div class="tll"><div class="tldot"></div></div>
-          <div class="tlb">
-            <div class="tltime">15:00</div><div class="tlname">下午深度体验</div>
-            <div class="tldet">根据你选择的【${S.style.map(s=>({citywalk:'慢游',nature:'自然',rush:'特种兵',road:'公路'})[s]||'特色'}.join('/')}】风格，安排对应的沉浸式活动。</div>
-            <a class="tllink" href="#">查看预订链接 →</a>
-          </div>
-        </div>
-      </div>
-    </div>`;
-  }
-  
-  document.getElementById('rdays').innerHTML = daysHtml;
-  
-  // 切换屏幕
-  document.getElementById('s1').classList.remove('active');
-  document.getElementById('s2').classList.add('active');
-  window.scrollTo(0,0);
-}
-</script>
-</body>
-</html>
