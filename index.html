@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LazyTrip · 全球结构化旅行看板生成器</title>
+<title>LazyTrip · 全球旅行攻略生成器</title>
 <style>
 :root{--bg:#FAFAF8;--surface:#fff;--surface2:#F4F3EF;--border:rgba(0,0,0,0.1);--border-md:rgba(0,0,0,0.18);--text:#1A1A18;--text2:#5A5A55;--text3:#999890;--teal:#1D9E75;--tl:#E1F5EE;--td:#0F6E56;--blue:#378ADD;--bl:#E6F1FB;--bd:#185FA5;--amber:#BA7517;--al:#FAEEDA;--coral:#993C1D;--cl:#FAECE7;--purple:#534AB7;--pl:#EEEDFE;--pd:#3C3489;--rl:#FCEBEB;--red:#A32D2D;--rb:#F09595;--r:12px;--rs:8px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -41,9 +41,6 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 .btn.teal{background:var(--teal);margin-top:0;}.btn.teal:hover{opacity:.9;}
 .back{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--text2);cursor:pointer;margin-bottom:1.5rem;padding:6px 0;border:none;background:none;}
 .back:hover{color:var(--text);}
-.tagrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 1.5rem;}
-.tag{font-size:12px;padding:4px 10px;border-radius:20px;font-weight:500;}
-.tg{background:var(--tl);color:var(--td);}.tb{background:var(--bl);color:var(--bd);}.ta{background:var(--al);color:var(--amber);}
 
 /* Step 0 Module */
 .step0-box{background:var(--surface);border:1.5px dashed var(--amber);border-radius:var(--r);padding:18px;margin-bottom:1.5rem;position:relative;overflow:hidden;}
@@ -89,7 +86,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 <div class="hdr">
   <span class="brand">LazyTrip MVP v2.0</span>
   <h1>全球旅行结构化看板生成器</h1>
-  <p>不写正确的废话游记，只生成带双币种预算、备选方案的执行清单。</p>
+  <p>告诉我你的旅行方式，生成一份真正能执行的行程</p>
 </div>
 <div class="pbar"><div class="ps act" id="p1"></div><div class="ps" id="p2"></div><div class="ps" id="p3"></div><div class="ps" id="p4"></div></div>
 
@@ -129,7 +126,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
   <div class="oc" data-g="budget" data-v="lux" onclick="selSingle(this, 'budget', true)"><div class="ot">精品型</div><div class="od">奢华酒店 + 米其林体验</div></div>
 </div>
 
-<button class="btn" id="gbtn" disabled onclick="generate()">生成我的全局控制面板 →</button>
+<button class="btn" id="gbtn" onclick="generate()">生成我的全局控制面板 →</button>
 <p class="fnote">完全本地生成 · 体验秒级响应的结构化结果</p>
 </div>
 
@@ -167,6 +164,7 @@ body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:var(
 </div>
 
 </div>
+
 <script>
 // 全局状态
 var S = {
@@ -196,17 +194,16 @@ function checkBtn() {
   S.dest = document.getElementById('idest').value.trim();
   S.days = parseInt(document.getElementById('idays').value) || 0;
   
+  // 修复进度条显示：只要填了一个区域，进度条就会前进
   var filled = 0;
   if(S.dest && S.days > 0) filled++;
   if(S.style.length > 0) filled++;
-  if(S.transit && S.worry.length > 0) filled++;
+  if(S.transit || S.worry.length > 0) filled++;
   if(S.budget) filled++;
 
   ['p1','p2','p3','p4'].forEach((id, i) => {
     document.getElementById(id).className = 'ps' + (i < filled ? ' done' : i === filled ? ' act' : '');
   });
-
-  document.getElementById('gbtn').disabled = filled < 4;
 }
 
 function goBack() {
@@ -215,9 +212,21 @@ function goBack() {
   window.scrollTo(0,0);
 }
 
-// 核心生成逻辑（取代了写死的新西兰数据）
+// 核心生成逻辑
 function generate() {
-  var dest = S.dest || '未知地';
+  S.dest = document.getElementById('idest').value.trim();
+  
+  // 💡【核心防呆设计】点击生成时，明确告诉用户漏填了什么
+  if(!S.dest) { 
+      document.getElementById('idest').focus(); 
+      return alert("🚨 请先在最上方填写【去哪里】！"); 
+  }
+  if(S.style.length === 0) return alert("🚨 请至少选择一个【旅行风格】！");
+  if(!S.transit) return alert("🚨 请选择【交通偏好】！");
+  if(S.worry.length === 0) return alert("🚨 请至少选择一个【担心的痛点】！");
+  if(!S.budget) return alert("🚨 请选择【预算偏好】！");
+
+  var dest = S.dest;
   var days = S.days;
   
   // 1. 设置标题和资金池
